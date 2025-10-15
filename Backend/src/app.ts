@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import userRouter from "./Routes/User Routes/user.route";
+import taskRoute from "./Routes/Task Routes/task.Route";
 const app = express();
 
 dotenv.config({
@@ -19,12 +21,19 @@ app.use(
   })
 );
 
-app.use(express.static("Public")); // when we need to store files/imgs/pdfs in locall machine we can put them inside public folder
+app.use(express.static("Public"));
 
-app.use(cookieParser()); // so that we can do CRUD operations over cookies
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  res.send("Good to go with the youtube premium");
+  console.log("we are here");
+  return res.json({
+    data: [],
+    message: "Task management server is up and runnning...",
+  });
 });
+
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/task", taskRoute);
 
 export { app };
