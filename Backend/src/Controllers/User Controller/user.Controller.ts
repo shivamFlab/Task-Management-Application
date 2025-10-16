@@ -56,17 +56,24 @@ const SignUpUser = async (req: any, res: any) => {
 const loginUser = async (req: any, res: any) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(400).json({ success: false, message: "Email and password are required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Email and password are required" });
   }
 
   const user = await User.findOne({ loginEmail: email });
   if (!user) {
-    return res.status(401).json({ success: false, message: "Invalid credentials" });
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid credentials" });
   }
 
+  //@ts-ignore
   const isPasswordCorrect = await user.isPasswordCorrect(password);
   if (!isPasswordCorrect) {
-    return res.status(401).json({ success: false, message: "Invalid credentials" });
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid credentials" });
   }
 
   const { accesstoken, refreshtoken } = await GenerateAccessAndRefreshTokens(
@@ -77,7 +84,6 @@ const loginUser = async (req: any, res: any) => {
     "-password -refreshToken"
   );
 
-
   return res.status(200).json({
     message: "User Logged In Successfully",
     user: loggedinuser,
@@ -87,13 +93,18 @@ const loginUser = async (req: any, res: any) => {
   });
 };
 
-const GenerateAccessAndRefreshTokens = async (userid:any) => {
+const GenerateAccessAndRefreshTokens = async (userid: any) => {
   try {
     const user = await User.findById(userid);
+    //@ts-ignore
     const accesstoken = user.generateAccessToken();
+    //@ts-ignore
     const refreshtoken = user.generateRefreshToken();
 
+    //@ts-ignore
+
     user.refreshToken = refreshtoken;
+    //@ts-ignore
     await user.save({ validateBeforeSave: false });
 
     return { accesstoken, refreshtoken };
