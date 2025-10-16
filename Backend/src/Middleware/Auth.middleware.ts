@@ -23,7 +23,7 @@ const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
         message: "Secret not found.",
       });
     }
-    const decodedToken = Jwt.verify(Token, secret);
+    const decodedToken = Jwt.verify(Token, secret) as { _id: string };
     if (!decodedToken) {
       return res.status(402).json({
         success: false,
@@ -41,6 +41,7 @@ const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
+    // @ts-expect-error augmenting req with userId
     req.user = user._id;
     next();
   } catch (error) {

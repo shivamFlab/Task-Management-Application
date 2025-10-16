@@ -15,6 +15,7 @@ const createNewTask = async (req: Request, res: Response) => {
     const newTask = await Task.create({
       title: title.trim(),
       description: description?.trim() || "",
+      // @ts-expect-error user augmented by middleware
       user: req?.user,
     });
 
@@ -66,7 +67,7 @@ const updateSpecificTask = async (req: Request, res: Response) => {
       id,
       {
         ...(title && { title: title.trim() }),
-        ...(description !== undefined && { description: description.trim() }),
+        ...(description !== undefined && { description: description?.trim?.() ?? "" }),
         ...(status && { status: status }),
       },
       { new: true, runValidators: true }
@@ -129,9 +130,8 @@ const deleteSpecificTask = async (req: Request, res: Response) => {
 };
 
 const getAllTaskOfUser = async (req: Request, res: Response) => {
-  const allTask = await Task.find({
-    user: req?.user,
-  });
+  // @ts-expect-error user augmented by middleware
+  const allTask = await Task.find({ user: req?.user });
 
   if (!allTask) {
     return res.json({

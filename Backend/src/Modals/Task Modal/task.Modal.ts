@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const taskSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
-    description: { type: String, required: true, require: false, default: "No description" },
+    description: { type: String, required: false, default: "No description" },
     status: {
       type: String,
       enum: ["Pending", "Working...", "Partially Completed", "Completed"],
@@ -11,7 +11,8 @@ const taskSchema = new mongoose.Schema(
     },
     user:{
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Task"
+      ref: "User",
+      required: true
     }
   },
   { timestamps: true }

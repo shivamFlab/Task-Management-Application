@@ -33,7 +33,12 @@ app.get("/", (req, res) => {
   });
 });
 
+// Legacy routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/task", taskRoute);
+
+// Standardized routes per spec
+app.use("/api/auth", userRouter);
+app.use("/api/tasks", taskRoute);
 
 export { app };

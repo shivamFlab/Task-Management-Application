@@ -2,7 +2,7 @@ import { User } from "../../Modals/User Modal/user.Modal";
 
 const SignUpUser = async (req: any, res: any) => {
   try {
-    console.log("Received signup requestL",req.body);
+    console.log("Received signup request", req.body);
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
@@ -25,7 +25,7 @@ const SignUpUser = async (req: any, res: any) => {
     const user = await User.create({
       username,
       loginEmail: email,
-      password, 
+      password,
     });
 
     const createdUser = await User.findById(user._id).select(
@@ -54,46 +54,37 @@ const SignUpUser = async (req: any, res: any) => {
 };
 
 const loginUser = async (req: any, res: any) => {
-  const { loginEmail, password } = req.body;
-  console.log(loginEmail, password);
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: "Email and password are required" });
+  }
 
-  const user = await User.findOne({
-    $or: [{ loginEmail }],
-  });
+  const user = await User.findOne({ loginEmail: email });
   if (!user) {
-    return res.status(200).json({
-      message: "Account not exist",
-      success: false,
-    });
+    return res.status(401).json({ success: false, message: "Invalid credentials" });
   }
 
-  const isPasswordCorrect = true; // (await user.isPasswordCorrect(password))
+  const isPasswordCorrect = await user.isPasswordCorrect(password);
   if (!isPasswordCorrect) {
-    return res.status(200).json({
-      message: "Wrong Cradentials",
-      success: false,
-    });
+    return res.status(401).json({ success: false, message: "Invalid credentials" });
   }
 
-    const { accesstoken, refreshtoken } = await GenerateAccessAndRefreshTokens(
-      user._id
-    );
+  const { accesstoken, refreshtoken } = await GenerateAccessAndRefreshTokens(
+    user._id
+  );
 
   const loggedinuser = await User.findById(user._id).select(
-    "-password -refreshtoken"
+    "-password -refreshToken"
   );
 
 
-  return (
-    res
-      .status(200)
-      .json({
-        message: "User Logged In  Successfully",
-        user: loggedinuser,
-        success: true,
-        token:accesstoken
-      })
-  );
+  return res.status(200).json({
+    message: "User Logged In Successfully",
+    user: loggedinuser,
+    success: true,
+    token: accesstoken,
+    refreshToken: refreshtoken,
+  });
 };
 
 const GenerateAccessAndRefreshTokens = async (userid:any) => {

@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema(
     username: { type: String, required: true },
     loginEmail: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    refreshToken: { type: String },
     mobileNumber: { type: String },
     currentStatus: {
       type: String,
@@ -36,7 +37,7 @@ UserSchema.methods.generateAccessToken = function () {
     {
       _id: this._id, 
     },
-    process.env.ACCESS_TOKEN_SECRET,
+    process.env.ACCESS_TOKEN_SECRET as string,
     {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
     }
@@ -49,7 +50,7 @@ UserSchema.methods.generateRefreshToken = function () {
     {
       _id: this._id, 
     },
-    process.env.REFRESH_TOKEN_SECRET,
+    process.env.REFRESH_TOKEN_SECRET as string,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
